@@ -22,18 +22,15 @@ part = "lid";              // [lid, bottom, preview]
    Reference point = centre of the M.2 2230 stand-off hole on the IO board
    (the screw hole closest to the M.2 socket, ~30 mm from the socket).
    usb_along  : distance from that hole centre to the centre of the USB-A
-                socket opening, measured ALONG the card (towards the 2280
-                end / towards the CM5 edge of the board). Negative = towards
-                the M.2 socket.
-   usb_across : offset ACROSS the card, + = towards the right-hand board
-                edge (the edge the M.2 card is next to), 0 = card centreline.
+                socket opening, measured ALONG the card.
+                -10.0 mm = 10mm towards the M.2 connector (towards the front edge).
+   usb_across : offset ACROSS the card, 0.0 = aligned to card centerline.
    ==================================================================== */
-usb_along  = 35.0;   // mm  <-- PLACEHOLDER, replace with your measurement
-usb_across = 0.0;    // mm  <-- PLACEHOLDER, replace with your measurement
+usb_along  = -10.0;  // mm, shifted 10mm towards M.2 connector from 2230 hole
+usb_across = 0.0;    // mm, centered across card width
 
-// Orientation of the socket's long (≈13 mm wide) side:
-//   true  = long side runs ACROSS the 22 mm card (most common for a
-//           vertical socket on a 22 mm wide board)
+// Orientation of the socket's long (≈13-16 mm wide) side:
+//   true  = long side runs ACROSS the 22 mm card (symmetrically centered)
 //   false = long side runs ALONG the card
 usb_long_side_across = true;
 
