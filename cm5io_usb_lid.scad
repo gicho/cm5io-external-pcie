@@ -47,10 +47,24 @@ corner_r  = 1.0;     // mm, corner radius of the cut-out
    solid frame. Set to 0 to disable. */
 frame = 3.0;         // mm, solid band around the cut-out
 
-/* Text engraving around the cut-out to clearly indicate PCIe bus signals */
-engrave_text  = "PCIe";
-engrave_depth = 0.6; // mm into top surface
+/* Text engraving around the cut-out (set to "" or engrave_depth = 0 to disable) */
+engrave_text  = "";
+engrave_depth = 0.0; // mm into top surface
 text_size     = 3.5; // mm font size
+
+/* Honeycomb holes to completely fill around the port:
+   - 2 holes partially intersected by the slot: (152.57, 23.23), (142.57, 31.23)
+   - 5 surrounding adjacent holes: (142.57, 17.23), (152.57, 9.23), (152.57, 37.23), (132.57, 23.23), (132.57, 37.23)
+*/
+hex_holes_to_fill = [
+    [152.57, 23.23], // partially cut (right)
+    [142.57, 31.23], // partially cut (left)
+    [142.57, 17.23], // surrounding (bottom-left)
+    [152.57,  9.23], // surrounding (bottom-right)
+    [152.57, 37.23], // surrounding (top-right)
+    [132.57, 23.23], // surrounding (mid-left)
+    [132.57, 37.23]  // surrounding (top-left)
+];
 
 /* ===== Geometry constants (do not change unless the base model changes) */
 // Upstream STLs are placed so that the PCB lower-left corner sits here:
@@ -76,15 +90,30 @@ module rrect(dx, dy, h, r) {
 
 module in_board_frame() { translate(board_origin_stl) children(); }
 
+module hex_plug(r = 3.55, h = 2.0) {
+    cylinder(r = r, h = h, $fn = 6);
+}
+
 module lid_modified() {
     difference() {
         union() {
             import("upstream/top_cm5io.stl", convexity = 10);
-            if (frame > 0)
-                in_board_frame()
-                    translate([usb_center_board[0], usb_center_board[1], lid_plate_z[0]])
-                        rrect(hole_dx + 2*frame, hole_dy + 2*frame,
-                              lid_plate_z[1] - lid_plate_z[0], corner_r + frame);
+            
+            in_board_frame() {
+                // Completely solid zone filling the 2 partially cut holes and 5 surrounding holes
+                translate([0, 0, lid_plate_z[0]])
+                    linear_extrude(lid_plate_z[1] - lid_plate_z[0])
+                        hull() {
+                            for (hp = hex_holes_to_fill) {
+                                translate([hp[0], hp[1]])
+                                    circle(r = 3.6, $fn = 6);
+                            }
+                            // Also include the slot margin so the entire surrounding area is solid
+                            translate([usb_center_board[0], usb_center_board[1]])
+                                offset(r = corner_r + frame)
+                                    square([hole_dx + 2*frame, hole_dy + 2*frame], center = true);
+                        }
+            }
         }
         // Rectangular cut-out for plug
         in_board_frame()
