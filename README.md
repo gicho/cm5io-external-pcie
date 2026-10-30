@@ -3,10 +3,10 @@
 ## Files
 | File | Purpose |
 |---|---|
-| `cm5io_usb_lid.scad` | Parametric OpenSCAD. You only edit the parameters at the top. |
+| `cm5io_usb_lid.scad` | Parametric OpenSCAD script for modified lid with USB cutout & "PCIe" engraving. |
 | `upstream/top_cm5io.stl`, `upstream/bottom_cm5io.stl` | Unmodified base case, "Case for Raspberry Pi CM5 & CM5IO" by **Cyryllo**, https://www.printables.com/model/1098386, licence **CC BY 4.0**. |
-| `out/top_cm5io_usb_placeholder.stl` | Test render with *placeholder* values. **Don't print it yet.** |
-| `reference/` | CM5IO datasheet and rev 2 KiCad files (RP-008099). The coordinates come from these. |
+| `out/top_cm5io_pcie.stl` | Ready-to-print modified lid STL. |
+| `reference/` | CM5IO datasheet and rev 2 KiCad files (RP-008099). |
 
 ## Coordinates (from the CM5IO rev 2 KiCad PCB)
 Origin: the PCB's lower-left corner, viewed from the top. The port edge is at Y = 0 and X runs along the 160 mm side.
@@ -31,8 +31,11 @@ The hole spacing (12 / 18 / 20 mm) is the standard M.2 pattern, measured from a 
 Quick check: the 2230 and 2260 holes on the IO board are exactly 30 mm apart. Use them to confirm your ruler reading.
 
 ## Build
-```
-openscad -o out/top_cm5io_usb.stl -D 'part="lid"' cm5io_usb_lid.scad
+```bash
+# Render the modified top lid STL for 3D printing
+openscad -o out/top_cm5io_pcie.stl -D 'part="lid"' cm5io_usb_lid.scad
+
+# Render an assembly preview image
 openscad -o out/preview.png --preview -D 'part="preview"' --viewall --autocenter cm5io_usb_lid.scad
 ```
 Print the bottom from `upstream/bottom_cm5io.stl` unchanged.
